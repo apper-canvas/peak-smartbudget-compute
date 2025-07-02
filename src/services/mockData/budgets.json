@@ -1,0 +1,44 @@
+[
+  {
+    "Id": 1,
+    "category": "housing",
+    "limit": 1500,
+    "period": "monthly",
+    "spent": 1200
+  },
+  {
+    "Id": 2,
+    "category": "food",
+    "limit": 600,
+    "period": "monthly",
+    "spent": 450
+  },
+  {
+    "Id": 3,
+    "category": "transportation",
+    "limit": 300,
+    "period": "monthly",
+    "spent": 180
+  },
+  {
+    "Id": 4,
+    "category": "entertainment",
+    "limit": 200,
+    "period": "monthly",
+    "spent": 120
+  },
+  {
+    "Id": 5,
+    "category": "shopping",
+    "limit": 400,
+    "period": "monthly",
+    "spent": 250
+  },
+  {
+    "Id": 6,
+    "category": "utilities",
+    "limit": 150,
+    "period": "monthly",
+    "spent": 85
+  }
+]

@@ -1,0 +1,92 @@
+[
+  {
+    "Id": 1,
+    "type": "income",
+    "amount": 5000,
+    "category": "salary",
+    "description": "Monthly salary deposit",
+    "date": "2024-01-15T00:00:00.000Z",
+    "createdAt": "2024-01-15T08:00:00.000Z"
+  },
+  {
+    "Id": 2,
+    "type": "expense",
+    "amount": 1200,
+    "category": "housing",
+    "description": "Rent payment",
+    "date": "2024-01-01T00:00:00.000Z",
+    "createdAt": "2024-01-01T12:00:00.000Z"
+  },
+  {
+    "Id": 3,
+    "type": "expense",
+    "amount": 450,
+    "category": "food",
+    "description": "Grocery shopping",
+    "date": "2024-01-10T00:00:00.000Z",
+    "createdAt": "2024-01-10T18:30:00.000Z"
+  },
+  {
+    "Id": 4,
+    "type": "expense",
+    "amount": 85,
+    "category": "utilities",
+    "description": "Electricity bill",
+    "date": "2024-01-05T00:00:00.000Z",
+    "createdAt": "2024-01-05T14:20:00.000Z"
+  },
+  {
+    "Id": 5,
+    "type": "expense",
+    "amount": 60,
+    "category": "transportation",
+    "description": "Gas for car",
+    "date": "2024-01-12T00:00:00.000Z",
+    "createdAt": "2024-01-12T16:45:00.000Z"
+  },
+  {
+    "Id": 6,
+    "type": "income",
+    "amount": 200,
+    "category": "freelance",
+    "description": "Website design project",
+    "date": "2024-01-18T00:00:00.000Z",
+    "createdAt": "2024-01-18T10:15:00.000Z"
+  },
+  {
+    "Id": 7,
+    "type": "expense",
+    "amount": 120,
+    "category": "entertainment",
+    "description": "Movie night and dinner",
+    "date": "2024-01-20T00:00:00.000Z",
+    "createdAt": "2024-01-20T21:30:00.000Z"
+  },
+  {
+    "Id": 8,
+    "type": "expense",
+    "amount": 250,
+    "category": "shopping",
+    "description": "Winter clothes",
+    "date": "2024-01-22T00:00:00.000Z",
+    "createdAt": "2024-01-22T15:00:00.000Z"
+  },
+  {
+    "Id": 9,
+    "type": "expense",
+    "amount": 75,
+    "category": "healthcare",
+    "description": "Doctor visit co-pay",
+    "date": "2024-01-25T00:00:00.000Z",
+    "createdAt": "2024-01-25T11:30:00.000Z"
+  },
+  {
+    "Id": 10,
+    "type": "income",
+    "amount": 150,
+    "category": "investment",
+    "description": "Dividend payment",
+    "date": "2024-01-28T00:00:00.000Z",
+    "createdAt": "2024-01-28T09:00:00.000Z"
+  }
+]
