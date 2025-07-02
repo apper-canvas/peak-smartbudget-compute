@@ -1,17 +1,17 @@
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import TransactionItem from '@/components/molecules/TransactionItem'
-import TransactionModal from '@/components/organisms/TransactionModal'
-import Loading from '@/components/ui/Loading'
-import Error from '@/components/ui/Error'
-import Empty from '@/components/ui/Empty'
-import Button from '@/components/atoms/Button'
-import Select from '@/components/atoms/Select'
-import Input from '@/components/atoms/Input'
-import ApperIcon from '@/components/ApperIcon'
-import { transactionService } from '@/services/api/transactionService'
-import { getExpenseCategories, getIncomeCategories } from '@/utils/categories'
-import { toast } from 'react-toastify'
+import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { toast } from "react-toastify";
+import { getExpenseCategories, getIncomeCategories } from "@/utils/categories";
+import ApperIcon from "@/components/ApperIcon";
+import TransactionModal from "@/components/organisms/TransactionModal";
+import Select from "@/components/atoms/Select";
+import Input from "@/components/atoms/Input";
+import Button from "@/components/atoms/Button";
+import TransactionItem from "@/components/molecules/TransactionItem";
+import Error from "@/components/ui/Error";
+import Empty from "@/components/ui/Empty";
+import Loading from "@/components/ui/Loading";
+import { transactionService } from "@/services/api/transactionService";
 
 const Transactions = () => {
   const [transactions, setTransactions] = useState([])
@@ -289,6 +289,7 @@ const Transactions = () => {
           icon={hasActiveFilters ? "Search" : "Receipt"}
         />
       )}
+)}
       
       {/* Transaction Modal */}
       <TransactionModal
@@ -299,6 +300,5 @@ const Transactions = () => {
       />
     </div>
   )
-}
 
 export default Transactions
