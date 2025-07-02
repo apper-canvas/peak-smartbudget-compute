@@ -35,9 +35,20 @@ const Dashboard = () => {
         goalService.getAll()
       ])
       
-      setTransactions(transactionsData)
+setTransactions(transactionsData)
       setBudgets(budgetsData)
       setGoals(goalsData)
+
+      // Calculate spent amounts and check for budget alerts
+      const budgetsWithSpent = budgetsData.map(budget => {
+        const spent = transactionsData
+          .filter(t => t.type === 'expense' && t.category === budget.category)
+          .reduce((sum, t) => sum + t.amount, 0)
+        return { ...budget, spent }
+      })
+      
+      // Check for budget alerts
+      await budgetService.checkBudgetAlerts(budgetsWithSpent)
     } catch (err) {
       setError('Failed to load dashboard data. Please try again.')
       console.error('Dashboard load error:', err)

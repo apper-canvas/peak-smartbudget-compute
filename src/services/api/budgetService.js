@@ -50,8 +50,14 @@ class BudgetService {
     return true
   }
   
-  delay(ms) {
+delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms))
+  }
+
+  // Check budget alerts using notification service
+  async checkBudgetAlerts(budgets) {
+    const { notificationService } = await import('./notificationService')
+    return notificationService.checkBudgetAlerts(budgets)
   }
 }
 

@@ -76,9 +76,20 @@ const Budgets = () => {
         
         await budgetService.create(budgetData)
         toast.success('Budget created successfully!')
-      }
+}
       
       await loadBudgets()
+      
+      // Check for budget alerts after updating budgets
+      const updatedBudgetsData = await budgetService.getAll()
+      const transactionsData = await transactionService.getAll()
+      const budgetsWithSpent = updatedBudgetsData.map(budget => {
+        const spent = transactionsData
+          .filter(t => t.type === 'expense' && t.category === budget.category)
+          .reduce((sum, t) => sum + t.amount, 0)
+        return { ...budget, spent }
+      })
+      await budgetService.checkBudgetAlerts(budgetsWithSpent)
     } catch (error) {
       if (error.message !== 'Budget already exists') {
         toast.error('Failed to save budget')
