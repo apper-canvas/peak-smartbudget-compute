@@ -286,10 +286,9 @@ const Transactions = () => {
           description={hasActiveFilters ? "Try adjusting your filters to see more results" : "Start by adding your first income or expense transaction"}
           actionLabel={hasActiveFilters ? "Clear Filters" : "Add Transaction"}
           onAction={hasActiveFilters ? clearFilters : handleAddTransaction}
-          icon={hasActiveFilters ? "Search" : "Receipt"}
+icon={hasActiveFilters ? "Search" : "Receipt"}
         />
       )}
-)}
       
       {/* Transaction Modal */}
       <TransactionModal
@@ -298,7 +297,8 @@ const Transactions = () => {
         onSave={handleSaveTransaction}
         transaction={editingTransaction}
       />
-    </div>
+</div>
   )
+}
 
 export default Transactions
