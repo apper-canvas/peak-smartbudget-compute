@@ -151,6 +151,95 @@ setTransactions(transactionsData)
         }
       }
     }
+}
+  
+  // Budget vs Actual Comparison Chart
+  const getBudgetComparisonData = () => {
+    // Calculate actual spending by category for current month
+    const categorySpending = currentMonthTransactions
+      .filter(t => t.type === 'expense')
+      .reduce((acc, t) => {
+        acc[t.category] = (acc[t.category] || 0) + t.amount
+        return acc
+      }, {})
+    
+    // Combine budget and actual data
+    const comparisonData = budgets.map(budget => ({
+      category: budget.category,
+      budget: budget.limit,
+      actual: categorySpending[budget.category] || 0
+    }))
+    
+    // Sort by budget amount descending
+    comparisonData.sort((a, b) => b.budget - a.budget)
+    
+    return {
+      series: [
+        {
+          name: 'Budget',
+          data: comparisonData.map(d => d.budget),
+          color: '#3b82f6'
+        },
+        {
+          name: 'Actual',
+          data: comparisonData.map(d => d.actual),
+          color: '#ef4444'
+        }
+      ],
+      options: {
+        chart: {
+          type: 'bar',
+          height: 350,
+          toolbar: { show: false }
+        },
+        xaxis: {
+          categories: comparisonData.map(d => d.category.charAt(0).toUpperCase() + d.category.slice(1)),
+          title: { text: 'Categories' }
+        },
+        yaxis: {
+          title: { text: 'Amount ($)' },
+          labels: {
+            formatter: function (val) {
+              return '$' + val.toLocaleString()
+            }
+          }
+        },
+        plotOptions: {
+          bar: {
+            horizontal: false,
+            columnWidth: '60%',
+            borderRadius: 4,
+            dataLabels: { position: 'top' }
+          }
+        },
+        dataLabels: {
+          enabled: true,
+          formatter: function (val) {
+            return '$' + val.toLocaleString()
+          },
+          offsetY: -20,
+          style: {
+            fontSize: '10px',
+            colors: ['#304758']
+          }
+        },
+        legend: {
+          position: 'top',
+          horizontalAlign: 'right'
+        },
+        tooltip: {
+          y: {
+            formatter: function (val) {
+              return '$' + val.toLocaleString()
+            }
+          }
+        },
+        grid: {
+          borderColor: '#f1f5f9',
+          strokeDashArray: 5
+        }
+      }
+    }
   }
   
   if (loading) {
@@ -207,9 +296,8 @@ setTransactions(transactionsData)
           delay={0.3}
         />
       </div>
-      
-      {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+{/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
         {/* Expense Breakdown */}
         <motion.div
           className="card"
@@ -236,6 +324,37 @@ setTransactions(transactionsData)
               <div className="text-center">
                 <ApperIcon name="PieChart" className="w-12 h-12 mx-auto mb-3 text-gray-300" />
                 <p>No expenses this month</p>
+              </div>
+            </div>
+          )}
+        </motion.div>
+        
+        {/* Budget vs Actual Comparison */}
+        <motion.div
+          className="card"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.45 }}
+        >
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-semibold text-gray-900">Budget vs Actual</h3>
+            <div className="text-sm text-gray-500">
+              {format(currentMonth, 'MMMM yyyy')}
+            </div>
+          </div>
+          
+          {budgets.length > 0 ? (
+            <Chart
+              options={getBudgetComparisonData().options}
+              series={getBudgetComparisonData().series}
+              type="bar"
+              height={300}
+            />
+          ) : (
+            <div className="flex items-center justify-center h-64 text-gray-500">
+              <div className="text-center">
+                <ApperIcon name="BarChart3" className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                <p>No budgets to compare</p>
               </div>
             </div>
           )}

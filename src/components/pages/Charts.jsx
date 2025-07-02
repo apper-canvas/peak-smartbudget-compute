@@ -1,26 +1,32 @@
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { format, startOfMonth, endOfMonth, subMonths, eachMonthOfInterval } from 'date-fns'
-import Chart from 'react-apexcharts'
-import Loading from '@/components/ui/Loading'
-import Error from '@/components/ui/Error'
-import Select from '@/components/atoms/Select'
-import ApperIcon from '@/components/ApperIcon'
-import { transactionService } from '@/services/api/transactionService'
-import { getCategoryColor } from '@/utils/categories'
+import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { eachMonthOfInterval, endOfMonth, format, startOfMonth, subMonths } from "date-fns";
+import Chart from "react-apexcharts";
+import { getCategoryColor } from "@/utils/categories";
+import ApperIcon from "@/components/ApperIcon";
+import Select from "@/components/atoms/Select";
+import Error from "@/components/ui/Error";
+import Loading from "@/components/ui/Loading";
+import { transactionService } from "@/services/api/transactionService";
+import { budgetService } from "@/services/api/budgetService";
 
 const Charts = () => {
   const [transactions, setTransactions] = useState([])
+  const [budgets, setBudgets] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [timeRange, setTimeRange] = useState('6')
   
-  const loadTransactions = async () => {
+const loadData = async () => {
     try {
       setLoading(true)
       setError('')
-      const data = await transactionService.getAll()
-      setTransactions(data)
+      const [transactionsData, budgetsData] = await Promise.all([
+        transactionService.getAll(),
+        budgetService.getAll()
+      ])
+      setTransactions(transactionsData)
+      setBudgets(budgetsData)
     } catch (err) {
       setError('Failed to load chart data. Please try again.')
       console.error('Charts load error:', err)
@@ -29,8 +35,8 @@ const Charts = () => {
     }
   }
   
-  useEffect(() => {
-    loadTransactions()
+useEffect(() => {
+    loadData()
   }, [])
   
   // Filter transactions by time range
@@ -257,13 +263,124 @@ const Charts = () => {
             }
           }
         }
+}
+    }
+  }
+  // Budget vs Actual Comparison Chart
+  const getBudgetComparisonData = () => {
+    const months = parseInt(timeRange)
+    const endDate = endOfMonth(new Date())
+    const startDate = startOfMonth(subMonths(endDate, months - 1))
+    
+    // Calculate actual spending by category for the time period
+    const categorySpending = filteredTransactions
+      .filter(t => t.type === 'expense')
+      .reduce((acc, t) => {
+        acc[t.category] = (acc[t.category] || 0) + t.amount
+        return acc
+      }, {})
+    
+    // Get monthly budget amounts for the time period
+    const monthlyBudgetTotal = budgets.reduce((acc, budget) => {
+      if (budget.period === 'monthly') {
+        acc[budget.category] = budget.limit * months
+      } else if (budget.period === 'yearly') {
+        acc[budget.category] = (budget.limit / 12) * months
+      }
+      return acc
+    }, {})
+    
+    // Combine budget and actual data for categories that have budgets
+    const comparisonData = budgets.map(budget => {
+      const totalBudget = budget.period === 'monthly' 
+        ? budget.limit * months 
+        : (budget.limit / 12) * months
+        
+      return {
+        category: budget.category,
+        budget: totalBudget,
+        actual: categorySpending[budget.category] || 0
+      }
+    })
+    
+    // Sort by budget amount descending
+    comparisonData.sort((a, b) => b.budget - a.budget)
+    
+    const periodLabel = months === 12 ? 'Year' : `${months} Months`
+    
+    return {
+      series: [
+        {
+          name: `Budget (${periodLabel})`,
+          data: comparisonData.map(d => d.budget),
+          color: '#3b82f6'
+        },
+        {
+          name: `Actual (${periodLabel})`,
+          data: comparisonData.map(d => d.actual),
+          color: '#ef4444'
+        }
+      ],
+      options: {
+        chart: {
+          type: 'bar',
+          height: 400,
+          toolbar: { show: true }
+        },
+        xaxis: {
+          categories: comparisonData.map(d => d.category.charAt(0).toUpperCase() + d.category.slice(1)),
+          title: { text: 'Categories' }
+        },
+        yaxis: {
+          title: { text: 'Amount ($)' },
+          labels: {
+            formatter: function (val) {
+              return '$' + val.toLocaleString()
+            }
+          }
+        },
+        plotOptions: {
+          bar: {
+            horizontal: false,
+            columnWidth: '65%',
+            borderRadius: 4,
+            dataLabels: { position: 'top' }
+          }
+        },
+        dataLabels: {
+          enabled: true,
+          formatter: function (val) {
+            return '$' + val.toLocaleString()
+          },
+          offsetY: -20,
+          style: {
+            fontSize: '10px',
+            colors: ['#304758']
+          }
+        },
+        legend: {
+          position: 'top',
+          horizontalAlign: 'right'
+        },
+        tooltip: {
+          y: {
+            formatter: function (val) {
+              return '$' + val.toLocaleString()
+            }
+          }
+        },
+        grid: {
+          borderColor: '#f1f5f9',
+          strokeDashArray: 5
+        }
       }
     }
   }
   
-  const expenseData = getExpenseBreakdownData()
+const expenseData = getExpenseBreakdownData()
   const trendData = getMonthlyTrendData()
   const categoryData = getCategorySpendingData()
+  const budgetComparisonData = getBudgetComparisonData()
   
   const timeRangeOptions = [
     { value: '3', label: 'Last 3 Months' },
@@ -274,11 +391,9 @@ const Charts = () => {
   if (loading) {
     return <Loading />
   }
-  
-  if (error) {
-    return <Error message={error} onRetry={loadTransactions} />
+if (error) {
+    return <Error message={error} onRetry={loadData} />
   }
-  
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -382,7 +497,35 @@ const Charts = () => {
                 </div>
               )}
             </motion.div>
-          </div>
+</div>
+          
+          {/* Budget vs Actual Comparison */}
+          <motion.div
+            className="card"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-semibold text-gray-900">Budget vs Actual Comparison</h3>
+              <ApperIcon name="BarChart2" className="w-5 h-5 text-gray-400" />
+            </div>
+            {budgets.length > 0 ? (
+              <Chart
+                options={budgetComparisonData.options}
+                series={budgetComparisonData.series}
+                type="bar"
+                height={400}
+              />
+            ) : (
+              <div className="flex items-center justify-center h-64 text-gray-500">
+                <div className="text-center">
+                  <ApperIcon name="BarChart2" className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                  <p>No budget data available for comparison</p>
+                </div>
+              </div>
+            )}
+          </motion.div>
         </div>
       )}
     </div>
