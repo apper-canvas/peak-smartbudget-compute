@@ -3,7 +3,7 @@ import { format } from 'date-fns'
 import ApperIcon from '@/components/ApperIcon'
 
 const GoalCard = ({ goal, onEdit, onDelete, delay = 0 }) => {
-  const { Id, name, targetAmount, currentAmount, targetDate } = goal
+  const { Id, name, targetAmount, currentAmount, targetDate, priority = 'Medium' } = goal
   const percentage = (currentAmount / targetAmount) * 100
   const remaining = targetAmount - currentAmount
   
@@ -12,6 +12,15 @@ const GoalCard = ({ goal, onEdit, onDelete, delay = 0 }) => {
       style: 'currency',
       currency: 'USD'
     }).format(amount)
+}
+  
+  const getPriorityColor = (priority) => {
+    const colors = {
+      'High': 'bg-error-100 text-error-800 border-error-200',
+      'Medium': 'bg-warning-100 text-warning-800 border-warning-200',
+      'Low': 'bg-success-100 text-success-800 border-success-200'
+    }
+    return colors[priority] || colors['Medium']
   }
   
   return (
@@ -21,36 +30,45 @@ const GoalCard = ({ goal, onEdit, onDelete, delay = 0 }) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
     >
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-secondary-500 to-secondary-600 rounded-lg flex items-center justify-center">
-            <ApperIcon name="Target" className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <h3 className="font-semibold text-gray-900">{name}</h3>
-            <p className="text-sm text-gray-500">
-              Target: {format(new Date(targetDate), 'MMM dd, yyyy')}
-            </p>
-          </div>
+<div className="relative">
+        {/* Priority Badge */}
+        <div className="absolute -top-2 -right-2 z-10">
+          <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full border ${getPriorityColor(priority)}`}>
+            {priority}
+          </span>
         </div>
         
-        <div className="flex items-center space-x-2">
-          <motion.button
-            onClick={() => onEdit(goal)}
-            className="p-2 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-          >
-            <ApperIcon name="Edit" className="w-4 h-4" />
-          </motion.button>
-          <motion.button
-            onClick={() => onDelete(Id)}
-            className="p-2 text-gray-400 hover:text-error-600 hover:bg-error-50 rounded-lg transition-colors"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-          >
-            <ApperIcon name="Trash2" className="w-4 h-4" />
-          </motion.button>
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-secondary-500 to-secondary-600 rounded-lg flex items-center justify-center">
+              <ApperIcon name="Target" className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-900">{name}</h3>
+              <p className="text-sm text-gray-500">
+                Target: {format(new Date(targetDate), 'MMM dd, yyyy')}
+              </p>
+            </div>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <motion.button
+              onClick={() => onEdit(goal)}
+              className="p-2 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+            >
+              <ApperIcon name="Edit" className="w-4 h-4" />
+            </motion.button>
+            <motion.button
+              onClick={() => onDelete(Id)}
+              className="p-2 text-gray-400 hover:text-error-600 hover:bg-error-50 rounded-lg transition-colors"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+            >
+              <ApperIcon name="Trash2" className="w-4 h-4" />
+            </motion.button>
+          </div>
         </div>
       </div>
       

@@ -4,32 +4,36 @@ import { format, addMonths } from 'date-fns'
 import ApperIcon from '@/components/ApperIcon'
 import Button from '@/components/atoms/Button'
 import Input from '@/components/atoms/Input'
+import Select from '@/components/atoms/Select'
 
 const GoalModal = ({ isOpen, onClose, onSave, goal = null }) => {
-  const [formData, setFormData] = useState({
+const [formData, setFormData] = useState({
     name: '',
     targetAmount: '',
     currentAmount: '',
-    targetDate: format(addMonths(new Date(), 6), 'yyyy-MM-dd')
+    targetDate: format(addMonths(new Date(), 6), 'yyyy-MM-dd'),
+    priority: 'Medium'
   })
   
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
   
-  useEffect(() => {
+useEffect(() => {
     if (goal) {
       setFormData({
         name: goal.name,
         targetAmount: goal.targetAmount.toString(),
         currentAmount: goal.currentAmount.toString(),
-        targetDate: format(new Date(goal.targetDate), 'yyyy-MM-dd')
+        targetDate: format(new Date(goal.targetDate), 'yyyy-MM-dd'),
+        priority: goal.priority || 'Medium'
       })
     } else {
       setFormData({
         name: '',
         targetAmount: '',
         currentAmount: '0',
-        targetDate: format(addMonths(new Date(), 6), 'yyyy-MM-dd')
+        targetDate: format(addMonths(new Date(), 6), 'yyyy-MM-dd'),
+        priority: 'Medium'
       })
     }
     setErrors({})
@@ -142,6 +146,19 @@ const GoalModal = ({ isOpen, onClose, onSave, goal = null }) => {
                   onChange={handleChange}
                   error={errors.name}
                   placeholder="e.g., Emergency Fund, Vacation, New Car"
+/>
+                
+                <Select
+                  label="Priority Level"
+                  name="priority"
+                  value={formData.priority}
+                  onChange={handleChange}
+                  options={[
+                    { value: 'High', label: 'High Priority' },
+                    { value: 'Medium', label: 'Medium Priority' },
+                    { value: 'Low', label: 'Low Priority' }
+                  ]}
+                  error={errors.priority}
                 />
                 
                 <div className="grid grid-cols-2 gap-4">

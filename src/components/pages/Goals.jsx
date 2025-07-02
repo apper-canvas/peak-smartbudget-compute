@@ -6,22 +6,36 @@ import Loading from "@/components/ui/Loading";
 import Error from "@/components/ui/Error";
 import Empty from "@/components/ui/Empty";
 import Button from "@/components/atoms/Button";
+import Select from "@/components/atoms/Select";
 import ApperIcon from "@/components/ApperIcon";
 import { goalService } from "@/services/api/goalService";
 import { toast } from "react-toastify";
 
 const Goals = () => {
-  const [goals, setGoals] = useState([])
+const [goals, setGoals] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [editingGoal, setEditingGoal] = useState(null)
-  
-  const loadGoals = async () => {
+  const [priorityFilter, setPriorityFilter] = useState('')
+  const [sortBy, setSortBy] = useState('priority')
+const loadGoals = async () => {
     try {
       setLoading(true)
       setError('')
-      const data = await goalService.getAll()
+      let data = await goalService.getAll()
+      
+      // Apply priority filter
+      if (priorityFilter) {
+        data = data.filter(goal => goal.priority === priorityFilter)
+      }
+      
+      // Sort by priority or other criteria
+      if (sortBy === 'priority') {
+        const priorityOrder = { 'High': 1, 'Medium': 2, 'Low': 3 }
+        data.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority])
+      }
+      
       setGoals(data)
     } catch (err) {
       setError('Failed to load goals. Please try again.')
@@ -31,9 +45,9 @@ const Goals = () => {
     }
   }
   
-  useEffect(() => {
+useEffect(() => {
     loadGoals()
-  }, [])
+  }, [priorityFilter, sortBy])
   
   const handleAddGoal = () => {
     setEditingGoal(null)
@@ -91,8 +105,36 @@ const Goals = () => {
     return <Error message={error} onRetry={loadGoals} />
   }
   
-  return (
+return (
     <div className="space-y-6">
+      {/* Filters and Controls */}
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="w-full sm:w-48">
+          <Select
+            value={priorityFilter}
+            onChange={(e) => setPriorityFilter(e.target.value)}
+            options={[
+              { value: '', label: 'All Priorities' },
+              { value: 'High', label: 'High Priority' },
+              { value: 'Medium', label: 'Medium Priority' },
+              { value: 'Low', label: 'Low Priority' }
+            ]}
+            placeholder="Filter by priority"
+          />
+        </div>
+        <div className="w-full sm:w-48">
+          <Select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            options={[
+              { value: 'priority', label: 'Sort by Priority' },
+              { value: 'name', label: 'Sort by Name' },
+              { value: 'amount', label: 'Sort by Amount' }
+            ]}
+          />
+        </div>
+      </div>
+      
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
